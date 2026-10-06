@@ -1,0 +1,432 @@
+openapi: 3.0.3
+info:
+  title: Servnix API
+  version: 1.0.0
+  description: Account, organization, and appointment endpoints.
+servers:
+  - url: http://localhost:3000
+    description: Local development server
+paths:
+  /v1/auth/signup:
+    post:
+      tags:
+        - Authentication
+      summary: Create an account
+      description: Every new account starts with the customer role. An administrator can change the role later. A token is not generated during signup.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignupRequest'
+      responses:
+        '201':
+          description: Customer account created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignupResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '409':
+          $ref: '#/components/responses/DuplicateEmail'
+  /v1/auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Log in to Servnix
+      description: Authenticates an account and returns a JWT access token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          headers:
+            Authorization:
+              description: JWT access token formatted as a Bearer token.
+              schema:
+                type: string
+                example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          description: Invalid email or password
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Account is suspended
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/auth/password/forgot:
+    post:
+      tags: [Authentication]
+      summary: Email a one-time password verification code
+      description: Requires configured SMTP. The response does not disclose whether the email belongs to an account.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email: { type: string, format: email }
+      responses:
+        '200': { description: Generic code delivery response }
+        '503': { description: Email delivery is unavailable }
+  /v1/auth/password/reset:
+    post:
+      tags: [Authentication]
+      summary: Verify an emailed code and set a new password
+      description: The 8-digit code expires after 20 minutes or five incorrect attempts. Successful reset revokes existing sessions.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, code, password]
+              properties:
+                email: { type: string, format: email }
+                code: { type: string, pattern: '^[0-9]{8}$' }
+                password: { type: string, format: password }
+      responses:
+        '200': { description: Password updated }
+        '400': { description: Invalid or expired verification code }
+  /v1/organizations/public:
+    get:
+      tags: [Organizations]
+      summary: List approved organizations, services, and opening hours
+      responses:
+        '200':
+          description: Public organization list
+  /v1/bookings:
+    post:
+      tags: [Bookings]
+      summary: Request an appointment as an authenticated customer
+      description: Times are entered in Pakistan Standard Time. A customer can have one active booking per service. Overlapping appointments for the same organization are rejected.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [serviceId, scheduledAt]
+              properties:
+                serviceId:
+                  type: string
+                  format: uuid
+                scheduledAt:
+                  type: string
+                  example: '2026-10-05T10:00'
+                durationMinutes:
+                  type: integer
+                  minimum: 15
+                  maximum: 480
+                  description: Requested appointment length; price is prorated from the provider's service rate.
+      responses:
+        '201':
+          description: Appointment requested
+        '401':
+          description: Authentication required
+        '409':
+          description: Service already booked or time unavailable
+  /v1/bookings/me:
+    get:
+      tags: [Bookings]
+      summary: List the signed-in customer's appointments
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Appointment history
+  /v1/bookings/provider:
+    get:
+      tags: [Bookings]
+      summary: List appointments for the signed-in provider's organization
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Provider appointments
+  /v1/bookings/availability:
+    get:
+      tags: [Bookings]
+      summary: List open 30-minute start times for a service on a date
+      parameters:
+        - in: query
+          name: serviceId
+          required: true
+          schema: { type: string, format: uuid }
+        - in: query
+          name: date
+          required: true
+          schema: { type: string, format: date }
+        - in: query
+          name: durationMinutes
+          schema: { type: integer, minimum: 15, maximum: 480 }
+      responses:
+        '200': { description: Available start times in Pakistan Standard Time }
+  /v1/bookings/quote:
+    get:
+      tags: [Bookings]
+      summary: Check a manual start time and calculate its duration based service amount
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: query
+          name: serviceId
+          required: true
+          schema: { type: string, format: uuid }
+        - in: query
+          name: scheduledAt
+          required: true
+          schema: { type: string, example: '2026-10-05T09:17' }
+        - in: query
+          name: durationMinutes
+          required: true
+          schema: { type: integer, minimum: 15, maximum: 480 }
+      responses:
+        '200': { description: Availability and calculated service amount }
+  /v1/bookings/me/{id}/cancel:
+    patch:
+      tags: [Bookings]
+      summary: Cancel an upcoming customer appointment
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200': { description: Booking cancelled }
+  /v1/bookings/me/{id}/reschedule:
+    patch:
+      tags: [Bookings]
+      summary: Request a new time for an upcoming appointment
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [scheduledAt]
+              properties:
+                scheduledAt: { type: string, example: '2026-10-05T10:00' }
+      responses:
+        '200': { description: New time requested; provider review required }
+  /v1/bookings/provider/{id}/status:
+    patch:
+      tags: [Bookings]
+      summary: Provider approves or rejects an appointment for their organization
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [decision]
+              properties:
+                decision: { type: string, enum: [confirmed, rejected] }
+                reason: { type: string, description: Required when rejecting }
+      responses:
+        '200': { description: Booking decision saved }
+  /v1/bookings/provider/{id}/complete:
+    patch:
+      tags: [Bookings]
+      summary: Provider marks a finished confirmed appointment completed
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200': { description: Appointment completed; customer may leave a review }
+        '409': { description: Appointment is not confirmed or has not finished }
+  /v1/notifications:
+    get:
+      tags: [Notifications]
+      summary: List the signed-in user's latest notifications
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { description: Notification list }
+  /v1/notifications/{id}/read:
+    patch:
+      tags: [Notifications]
+      summary: Mark one notification as read
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200': { description: Notification read }
+  /v1/reviews/organization/{id}:
+    get:
+      tags: [Reviews]
+      summary: List public reviews for an approved organization
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200': { description: Review list }
+  /v1/reviews:
+    post:
+      tags: [Reviews]
+      summary: Review an appointment marked completed by the provider
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [bookingId, rating]
+              properties:
+                bookingId: { type: string, format: uuid }
+                rating: { type: integer, minimum: 1, maximum: 5 }
+                comment: { type: string, maxLength: 1000 }
+      responses:
+        '201': { description: Review created }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    SignupRequest:
+      type: object
+      required:
+        - name
+        - email
+        - password
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 120
+          example: Jane Doe
+        email:
+          type: string
+          format: email
+          example: jane@example.com
+        password:
+          type: string
+          format: password
+          minLength: 8
+          description: Must include uppercase, lowercase, and a number.
+          example: SecurePass1
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: jane@example.com
+        password:
+          type: string
+          format: password
+          example: SecurePass1
+    User:
+      type: object
+      required:
+        - id
+        - name
+        - email
+        - role
+        - status
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          example: customer
+        status:
+          type: string
+          example: pending
+    SignupResponse:
+      type: object
+      required:
+        - message
+        - user
+      properties:
+        message:
+          type: string
+          example: Your account has been created successfully.
+        user:
+          $ref: '#/components/schemas/User'
+    LoginResponse:
+      type: object
+      required:
+        - message
+        - user
+        - token
+      properties:
+        message:
+          type: string
+          example: Welcome back to Servnix.
+        user:
+          $ref: '#/components/schemas/User'
+        token:
+          type: string
+          description: JWT access token. Send it as a Bearer token for protected endpoints.
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.example
+    ErrorResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+  responses:
+    ValidationError:
+      description: Request validation failed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    DuplicateEmail:
+      description: An account already exists with this email address
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'

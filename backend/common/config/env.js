@@ -1,0 +1,4 @@
+import dotenv from 'dotenv'
+dotenv.config({ path: '.env.local', override: true })
+for (const key of ['DATABASE_URL', 'JWT_SECRET']) if (!process.env[key]) throw new Error(`${key} is required in .env.local`)
+export const env = { port: Number(process.env.PORT) || 3000, clientUrl: process.env.CLIENT_URL || 'http://localhost:5173', databaseUrl: process.env.DATABASE_URL, jwtSecret: process.env.JWT_SECRET, jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d' }

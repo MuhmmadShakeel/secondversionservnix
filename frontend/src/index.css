@@ -1,0 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600;1,700&display=swap');
+@import "tailwindcss";
+@theme { --font-sans: "DM Sans", sans-serif; --font-display: "Playfair Display", serif; }
+@layer base { html { scroll-behavior: smooth; } body { @apply m-0 min-w-[320px] bg-white text-[#301a28]; } button { @apply cursor-pointer; } }
