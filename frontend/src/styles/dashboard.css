@@ -1,0 +1,108 @@
+/* Shared shell and navigation. Kept separate from page styling for easier updates. */
+.app-layout { align-items: stretch; }
+.sidebar {
+  width: 278px;
+  flex-basis: 278px;
+  height: 100vh;
+  min-height: 0;
+  padding: 28px 18px 22px;
+  overflow-y: auto;
+  gap: 0;
+  box-shadow: 2px 0 18px rgb(42 34 88 / 2%);
+}
+.sidebar .brand { margin: 0 10px 30px; width: fit-content; }
+.sidebar .brand-mark { width: 36px; height: 36px; line-height: 36px; border-radius: 11px; }
+.workspace-card {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-bottom: 35px;
+  padding: 13px;
+  border: 1px solid #e8e4f3;
+  border-radius: 13px;
+  background: #faf9fe;
+}
+.workspace-card .workspace-avatar { width: 39px; height: 39px; flex: 0 0 39px; font-size: 17px; }
+.workspace-card-copy { min-width: 0; display: grid; gap: 3px; }
+.workspace-card-copy strong { font-size: 13px; line-height: 1.2; }
+.workspace-card-copy small { color: #858299; font-size: 11px; line-height: 1.3; }
+.sidebar-navigation { flex: 1; }
+.sidebar .nav-label { margin: 0 0 13px; color: #918ca6; font-size: 10px; }
+.side-nav { gap: 5px; }
+.sidebar .nav-item {
+  position: relative;
+  min-height: 48px;
+  height: auto;
+  gap: 13px;
+  color: #625f74;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.3;
+  padding: 11px 13px;
+  transition: color .18s, background .18s;
+}
+.sidebar .nav-item span { flex: 1; }
+.sidebar .nav-item.active { color: #5d3bd8; background: #f0ecff; }
+.sidebar .nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 10px;
+  bottom: 10px;
+  width: 3px;
+  border-radius: 0 4px 4px 0;
+  background: #7050ee;
+}
+.nav-chevron { opacity: .42; flex: 0 0 auto; }
+.sidebar .nav-item.active .nav-chevron { opacity: 1; }
+.sidebar .sidebar-bottom { margin: 32px 0 0; padding: 17px; }
+.sidebar .sidebar-bottom strong { display: block; font-size: 13px; line-height: 1.35; }
+.sidebar .sidebar-bottom p { font-size: 11px; line-height: 1.6; }
+.sidebar .sidebar-bottom button { font-size: 11px; }
+.sidebar .sidebar-footer { margin: 18px 10px 0; font-size: 11px; }
+.topbar { min-height: 75px; }
+.topbar-greeting { font-size: 13px; }
+.page-content { width: 100%; }
+.page-heading p, .trade-intro p { font-size: 13px; line-height: 1.6; }
+.section-title p, .job-card p, .service-card p, .trade-card p { font-size: 12px; }
+.nav-item:focus-visible, .brand:focus-visible { outline-offset: 2px; }
+
+@media (max-width: 800px) {
+  .app-layout { flex-direction: column; }
+  .sidebar {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    flex-basis: auto;
+    transform: none;
+    overflow: visible;
+    padding: 18px 20px 20px;
+    border-right: 0;
+    border-bottom: 1px solid #edeef3;
+  }
+  .sidebar .brand { margin: 0 0 15px; }
+  .workspace-card { margin-bottom: 17px; max-width: 380px; }
+  .sidebar .nav-label { padding: 0; }
+  .side-nav { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .sidebar .nav-item { min-height: 46px; border: 1px solid #eeebf5; }
+  .sidebar .nav-item.active { border-color: #d6ccfc; }
+  .sidebar .sidebar-bottom { margin-top: 16px; }
+  .sidebar .sidebar-footer { margin: 13px 0 0; }
+  .topbar { padding: 0 20px; }
+}
+
+@media (max-width: 600px) {
+  .sidebar { padding: 16px 14px; }
+  .side-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+  .sidebar .nav-item { padding: 10px; gap: 8px; font-size: 11px; }
+  .sidebar .nav-item svg:first-child { width: 17px; height: 17px; flex: 0 0 auto; }
+  .nav-chevron { display: none; }
+  .sidebar .sidebar-bottom { padding: 14px; }
+  .topbar { gap: 10px; min-height: 0; padding: 12px 14px; flex-wrap: wrap; }
+  .topbar-greeting { display: block; font-size: 11px; line-height: 1.3; }
+  .topbar-actions { flex: 1 1 auto; justify-content: flex-end; }
+  .profile-button { width: 32px; height: 32px; }
+}

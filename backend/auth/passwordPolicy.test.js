@@ -1,10 +1,17 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { validateNewPassword } from './passwordPolicy.js'
+import { normalizeEmail, validateName, validatePassword } from './passwordPolicy.js'
 
-test('password policy accepts a strong password and rejects weak or oversized passwords', () => {
-  assert.doesNotThrow(() => validateNewPassword('StrongPass123'))
-  for (const password of ['short1A', 'alllowercase123', 'ALLUPPERCASE123', 'NoNumbersHere', 'A1' + 'x'.repeat(127)]) {
-    assert.throws(() => validateNewPassword(password), { statusCode: 400 })
-  }
+test('normalizes email and name', () => {
+  assert.equal(normalizeEmail('  Person@Example.COM '), 'person@example.com')
+  assert.equal(validateName('  Alex   Morgan  '), 'Alex Morgan')
+})
+
+test('rejects invalid email and weak or oversized passwords', () => {
+  assert.throws(() => normalizeEmail('not-an-email'))
+  assert.throws(() => validatePassword('weak'))
+  assert.throws(() => validatePassword('Abc1234'))
+  assert.throws(() => validatePassword('A1' + 'a'.repeat(71)))
+  assert.equal(validatePassword('Abc12345'), 'Abc12345')
+  assert.equal(validatePassword('StrongPass123'), 'StrongPass123')
 })

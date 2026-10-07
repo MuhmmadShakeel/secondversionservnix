@@ -1,0 +1,52 @@
+.my-service-card { display: flex; flex-direction: column; }
+.my-service-card p { min-height: 52px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+.my-service-meta { display: flex; flex-wrap: wrap; gap: 8px 15px; color: #9390a4; font-size: 10px; margin-top: auto; }
+.my-service-card .service-card-footer { align-items: center; }
+.my-service-card .service-card-footer strong { font-size: 13px; white-space: nowrap; }
+.my-service-actions { display: flex; gap: 6px; }
+.my-service-actions button { display: inline-flex; align-items: center; gap: 5px; border: 1px solid #e7e2f3; border-radius: 8px; background: #fff; padding: 7px 9px; color: #6947db; font-size: 11px; font-weight: 700; }
+.my-service-actions button:hover { background: #f5f1ff; }
+.my-service-actions .danger-action { color: #ae4b55; border-color: #f1d9dd; }
+.my-service-actions .danger-action:hover { background: #fff3f4; }
+.service-form { display: grid; gap: 14px; }
+.service-form label { display: grid; gap: 7px; color: #4c4860; font-size: 12px; font-weight: 700; }
+.service-form input, .service-form textarea, .service-form select { width: 100%; border: 1px solid #dedbe9; border-radius: 9px; background: #fff; padding: 11px 12px; color: #302d42; font-size: 12px; outline: none; }
+.service-form input:focus, .service-form textarea:focus, .service-form select:focus { border-color: #8b73e9; box-shadow: 0 0 0 3px rgb(111 77 230 / 10%); }
+.service-form textarea { resize: vertical; }
+.service-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.service-form-actions { display: flex; justify-content: flex-end; gap: 9px; border-top: 1px solid #eeeaf3; padding-top: 16px; margin-top: 5px; }
+.service-form-actions button:disabled { opacity: .6; cursor: wait; }
+.service-loading { padding: 50px 20px; text-align: center; background: #fff; border: 1px solid #e9e6f0; border-radius: 14px; color: #747087; font-size: 13px; }
+.service-loading button { border: 0; background: none; color: #6845dd; font-weight: 800; text-decoration: underline; }
+.delete-copy { color: #777387; font-size: 13px; line-height: 1.6; }
+.delete-button { border: 0; border-radius: 9px; background: #b64d5b; color: #fff; padding: 10px 14px; font-size: 12px; font-weight: 800; }
+.delete-button:hover { background: #9f3644; }
+.service-tabs { display: flex; gap: 7px; margin-bottom: 22px; padding: 6px; border: 1px solid #ece9f5; border-radius: 14px; background: #f3f0fa; overflow-x: auto; }
+.service-tabs button { display: inline-flex; align-items: center; gap: 9px; border: 0; border-radius: 10px; padding: 11px 15px; background: transparent; color: #77728d; font-size: 12px; font-weight: 800; white-space: nowrap; }
+.service-tabs button.active { background: #fff; color: #6643dc; box-shadow: 0 4px 14px #30225b12; }
+.service-tabs button span { min-width: 21px; padding: 3px 6px; border-radius: 7px; background: #e8e1fb; color: #6846db; font-size: 10px; text-align: center; }
+.booking-service-summary { border: 1px solid #e8e1f5; border-radius: 13px; background: linear-gradient(125deg, #f6f2ff, #fff); padding: 18px; margin-bottom: 20px; }
+.booking-service-summary span { color: #7857df; font-size: 9px; font-weight: 800; letter-spacing: 1.5px; }
+.booking-service-summary h3 { margin: 7px 0 2px; font-family: Manrope, sans-serif; font-size: 17px; }
+.booking-service-summary p { margin: 0 0 11px; color: #79748b; font-size: 11px; }
+.booking-service-summary strong { display: block; font-size: 15px; }
+.booking-service-summary small { display: block; margin-top: 8px; color: #9690a5; font-size: 10px; overflow-wrap: anywhere; }
+.booking-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 17px; }
+.booking-card { border: 1px solid #e9e6f0; border-radius: 16px; background: #fff; padding: 20px; min-width: 0; box-shadow: 0 6px 24px #28205908; }
+.booking-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.booking-card h3 { margin: 6px 0 0; font-family: Manrope, sans-serif; font-size: 16px; }
+.booking-status { flex: none; padding: 6px 9px; border-radius: 20px; font-size: 10px; font-weight: 800; }
+.booking-status.pending { background: #fff4df; color: #9a6819; }
+.booking-status.approved { background: #e7f6ee; color: #26815c; }
+.booking-status.rejected, .booking-status.cancelled { background: #f7e9eb; color: #a44854; }
+.booking-card-people { display: flex; align-items: center; gap: 6px; margin-top: 14px; color: #6c6681; font-size: 11px; font-weight: 700; }
+.booking-card-details { margin: 16px 0; color: #635f73; font-size: 12px; line-height: 1.6; white-space: pre-wrap; }
+.booking-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 15px; border-radius: 10px; background: #f8f7fc; }
+.booking-facts span { color: #4f4a61; font-size: 11px; overflow-wrap: anywhere; }
+.booking-facts strong { display: block; margin-bottom: 3px; color: #9691a6; font-size: 10px; }
+.booking-card-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+.booking-card-footer small { color: #a6a0b3; font-size: 9px; overflow-wrap: anywhere; }
+.booking-card-footer>div { display: flex; gap: 7px; }
+.booking-card-footer button { padding: 8px 11px; }
+@media (max-width: 900px) { .booking-grid { grid-template-columns: 1fr; } }
+@media (max-width: 600px) { .service-form-row { grid-template-columns: 1fr; } .my-service-card .service-card-footer { flex-wrap: wrap; } }
